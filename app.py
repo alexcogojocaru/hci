@@ -19,6 +19,8 @@ SEARCH_BUTTON    = 'search_button'
 SPEAK_BUTTON     = 'speak_button'
 SEARCH_ENTRY     = 'search_entry'
 RESPONSE_TEXTBOX = 'response_textbox'
+HELP_SPEAK_BUTTON = 'help_speak_button'
+HELP_SEARCH_BUTTON = 'help_search_button'
 
 
 class App:
@@ -27,7 +29,9 @@ class App:
         SEARCH_BUTTON: None, 
         SPEAK_BUTTON: None, 
         SEARCH_ENTRY: None,
-        RESPONSE_TEXTBOX: None
+        RESPONSE_TEXTBOX: None,
+        HELP_SPEAK_BUTTON: None,
+        HELP_SEARCH_BUTTON: None,
     }
 
     def __init__(self, master=None) -> None:
@@ -61,6 +65,16 @@ class App:
             fg=self.color_config.extra_color
         )
 
+        self.WIDGETS[HELP_SEARCH_BUTTON].config(
+            bg=self.color_config.secondary_color, 
+            fg=self.color_config.extra_color
+        )
+
+        self.WIDGETS[HELP_SPEAK_BUTTON].config(
+            bg=self.color_config.secondary_color, 
+            fg=self.color_config.extra_color
+        )
+
         self.WIDGETS[SEARCH_ENTRY].config(
             bg=self.color_config.primary_color
         )
@@ -77,9 +91,9 @@ class App:
             self.WIDGETS[SEARCH_ENTRY].delete(0, tk.END)
             self.WIDGETS[RESPONSE_TEXTBOX].config(state=tk.NORMAL)
             self.WIDGETS[RESPONSE_TEXTBOX].delete('1.0', tk.END)
-    
+
             self.recognizer.text_to_speech(f'Searching for "{text}"')
-    
+
             response = WebSurfer.google_search_keywords(text)
             for link in response:
                 self.WIDGETS[RESPONSE_TEXTBOX].insert(tk.END, f'{link}\n')
@@ -105,6 +119,18 @@ class App:
             for link in response:
                 self.WIDGETS[RESPONSE_TEXTBOX].insert(tk.END, f'{link}\n')
             self.WIDGETS[RESPONSE_TEXTBOX].config(state=tk.DISABLED)
+        else:
+            self.recognizer.text_to_speech('An error has occured, I couldn\'t understand you')
+
+    def help_search_button_pressed(self, event):
+        msg = 'Type your query in the search box and press the search button'
+        thread = Thread(target=self.recognizer.text_to_speech, args=(msg,))
+        thread.start()
+
+    def help_speak_button_pressed(self, event):
+        msg = 'Press the speak button and say the keywords'
+        thread = Thread(target=self.recognizer.text_to_speech, args=(msg,))
+        thread.start()
 
     def run(self):
         self.WIDGETS[MAINWINDOW].mainloop()
